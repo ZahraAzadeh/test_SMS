@@ -1,12 +1,5 @@
 import os
-
-# -------------------------
-# SMS / MeliPayamak Settings
-# -------------------------
-
-MELI_API_KEY = os.getenv("MELIPAYAMAK_API_KEY")  # Your API key (token)
-SMS_SENDER = os.getenv("SMS_SENDER")             # Your Melipayamak line number
-SMS_RECEIVER = os.getenv("SMS_RECEIVER")         # Destination phone
+import logging
 
 # -------------------------
 # Email Settings
@@ -18,21 +11,29 @@ EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 # -------------------------
-# ISS Tracking Settings
+# SMTP compatibility (for send_email.py)
 # -------------------------
 
-ISS_CHECK_INTERVAL = int(os.getenv("ISS_CHECK_INTERVAL", "60"))
-ALERT_DISTANCE_KM = int(os.getenv("ALERT_DISTANCE_KM", "2000"))
+SMTP_HOST = EMAIL_HOST
+SMTP_PORT = EMAIL_PORT
+SMTP_USER = EMAIL_ADDRESS
+SMTP_PASS = EMAIL_PASSWORD
+
+EMAIL_FROM = EMAIL_ADDRESS
+EMAIL_TO = os.getenv("EMAIL_TO")
 
 # -------------------------
 # Logging
 # -------------------------
 
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+LOG_FILE = os.getenv("LOG_FILE", "app.log")
+LOG_LEVEL_NAME = os.getenv("LOG_LEVEL", "INFO").upper()
+LOG_LEVEL = getattr(logging, LOG_LEVEL_NAME, logging.INFO)
 
 # -------------------------
-# HTTP Retry Settings
+# SMS / MeliPayamak Settings
 # -------------------------
 
-HTTP_RETRIES = int(os.getenv("HTTP_RETRIES", "3"))
-HTTP_BACKOFF_SECONDS = int(os.getenv("HTTP_BACKOFF_SECONDS", "2"))
+MELI_API_KEY = os.getenv("MELIPAYAMAK_API_KEY")
+SMS_SENDER = os.getenv("SMS_SENDER")
+SMS_RECEIVER = os.getenv("SMS_RECEIVER")

@@ -1,34 +1,60 @@
-name: Python application
+name: ISS Tracker SMS & Email
 
+# Trigger workflow on push, pull request, or manual run
 on:
+  workflow_dispatch:       # اجرای دستی
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  build:
+  run-iss-tracker:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
+      # 4️⃣ Run ISS Tracker script
       - name: Run main.py
         env:
+          # SMS / Melipayamak
           MELIPAYAMAK_API_KEY: ${{ secrets.MELIPAYAMAK_API_KEY }}
           SMS_SENDER: ${{ secrets.SMS_SENDER }}
           SMS_RECEIVER: ${{ secrets.SMS_RECEIVER }}
+
+          # Email
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          LOG_FILE: ${{ secrets.LOG_FILE }}          # اختیاری
-          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}        # اختیاری
-        run: python main.py
+
+          # Logging
+          LOG_FILE: logs/app.log        # مسیر امن برای فایل لاگ
+          LOG_LEVEL: INFO
+
+          # Optional ISS settings
+          ISS_CHECK_INTERVAL: 60
+          ALERT_DISTANCE_KM: 2000
+
+          # HTTP retry settings
+          HTTP_RETRIES: 3
+          HTTP_BACKOFF_SECONDS: 2
+
+        run: |
+          # ایجاد پوشه لاگ اگر مسیر فایل پیچیده است
+          mkdir -p $(dirname $LOG_FILE) || true
+          # اجرای اسکریپت
+          python main.py
